@@ -2,6 +2,7 @@ from pprint import pprint
 # читаем адресную книгу в формате CSV в список contacts_list
 import csv
 import re
+
 with open("phonebook_raw.csv", encoding = "utf-8") as f:
   rows = csv.reader(f, delimiter=",")
   contacts_list = list(rows)
@@ -11,7 +12,12 @@ with open("phonebook_raw.csv", encoding = "utf-8") as f:
 
 contacts_dict = {}
 for line in range(1, len(contacts_list)):
+    raw = ','.join(contacts_list[line])
+    # for key, pattern in patterns.items():
+    #     row_data = re.sub(pattern['regexp'], pattern['subst'], raw)
+    # print(row_data.split(','))
     # редактируем ФИО
+
     name = []
     name.append(contacts_list[line][0])
     name.append(contacts_list[line][1])
@@ -19,14 +25,32 @@ for line in range(1, len(contacts_list)):
     one_name = ' '.join(name)
     three_names = one_name.strip().split()
 
-    # редактируем номер телефона
-    phone_number_raw = contacts_list[line][-2]
-    right_format = re.sub(r'((\+7|8)?\s*\(?(\d{3})\)?[\s-]*(\d{3})[\s-]*(\d{2})[\s-]*(\d{2})\s*\(?(доб\.)?\s*((\d{4}))?\)?)',
-                          r'+7(\3)\4-\5-\6 \7\8', phone_number_raw)
-    #создаем список для каждого человека
+# создаем список для каждого человека
     all_info = three_names[1:3] + contacts_list[line][3:5]
-    all_info.append(right_format)
-    all_info.append(contacts_list[line][6])
+
+    # редактируем номер телефона
+#     phone_number_raw = contacts_list[line][-2]
+    phone = []
+    right_format_phone_ = re.search(r'((\+7|8)?\s*\(?(\d{3})\)?[\s-]*(\d{3})[\s-]*(\d{2})[\s-]*(\d{2}))', raw)
+    if right_format_phone_ is not None:
+        right_format_phone = right_format_phone_.group(0)
+        right_format_phone = re.sub(r'((\+7|8)?\s*\(?(\d{3})\)?[\s-]*(\d{3})[\s-]*(\d{2})[\s-]*(\d{2}))', r'+7(\3)\4-\5-\6', right_format_phone)
+        phone.append(right_format_phone)
+
+    right_format_add_phone_ = re.search(r'[\(]?доб\.\s(\d+)[\)]?', raw)
+    if right_format_add_phone_ is not None:
+        right_format_add_phone = right_format_add_phone_.group(0)
+        right_format_add_phone = re.sub(r'[\(]?доб\.\s(\d+)[\)]?', r' доп.\1', right_format_add_phone)
+        phone.append(right_format_add_phone)
+    phone = ''.join(phone)
+    all_info.append(phone)
+
+    # редактируем email
+    email = re.search(r'([\d*]|[\w*]|[\.])*@[a-z]*\.[\w]*', raw)
+
+    if email is not None:
+        email_ = email.group(0)
+        all_info.append(email_)
 
     # делаем проверку на повторение людей через словарь
     lastname = three_names[0]
@@ -35,7 +59,6 @@ for line in range(1, len(contacts_list)):
         new_info = []
         info_in_dict = contacts_dict[lastname]
         zipped_info = list(zip(info_in_dict, all_info))
-        pprint(zipped_info)
         for double in zipped_info:
             double_rem = list(double)
             if double_rem[0] == double_rem[1]:
@@ -47,8 +70,6 @@ for line in range(1, len(contacts_list)):
                 new_info.append(one_rem)
             else:
                 new_info.append(', '.join(double_rem))
-
-        #print(new_info)
         contacts_dict.update({lastname: new_info})
 
     else:
@@ -60,7 +81,9 @@ for key, value in list(contacts_dict.items()):
     person_list = person_list + value
     final_list.append(person_list)
 pprint(final_list)
-
+with open("phonebook.csv", "w") as f:
+  datawriter = csv.writer(f, delimiter=',')
+  datawriter.writerows(final_list)
 
 
 
