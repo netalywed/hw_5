@@ -209,11 +209,8 @@ def recognition(user_message):
 
 if __name__ == "__main__":
 
-    # Получение ТОКЕНА. Если нет прикрепленного файла, используем ручной ввод.
-    # with open('group_token.txt', 'r') as file_object:
-    token_VK_group = 'b059649cc85100192ce4c665f56497fe57af9856523a558e36c153280382d0acf6a52c7c0add506eb5c94' #file_object.read().strip()
-    # with open('token_VK.txt', 'r') as file_object:
-    token_VK = 'e3f47e8c68cc83b35fc53f2e10c2610de82223cb9451f28d2197b4b5791afa6f23eeb96a488b701e027c4' #file_object.read().strip()
+    token_VK_group = ''
+    token_VK = ''
 
     vk_group = vk_api.VkApi(token=token_VK_group)
     # vk_session = vk_group.get_api()
