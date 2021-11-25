@@ -1,0 +1,43 @@
+Модули
+--------
+main.py (осуществляет запуск диалога и соблюдение логики при общении)
+class_client.py (осуществляет сбор информации о пользователе, уточнение недостающей информации у пользователя, поиск подходищих кандидатов
+    и отправку информации о кандидате пользователю)
+candidate.py (осуществляет отбор кандидатов по БД, поиск фото, а также распознавание речи)
+bd_script.py (осуществляет поиск и внесение в базу данных пользователей и кандидатов, чтобы не выводить кандидатов повторно)
+dictionary.json (содержит информацию о переменных vk, позволяет соотнести с ними данные из ввода пользователя)
+settings.py (содержит токены vk и креды для доступа к БД)
+create_bd.txt (содержит запросы sql для консоли для создания БД)
+requirements.txt (технические требования к программе)
+
+Инструкция по запуску
+----------------------
+1. Создать базу данных
+2. Создать таблицы с помощью запросов из create_bd.txt
+3. В settings.py переменной postgres_request присвоить <'postgresql://username:password@localhost:5432/database'>
+4. В vk создать группу и забрать токен группы в переменную token_VK_group в файле settings.py
+5. Забрать токен vk в переменную token_VK в файле settings.py
+6. Запустить main.py
+
+Инструкция по настройке
+-----------------------
+Настроить количество выдаваемых фотографий (уже отсортированных по популярности)
+candidate.py, search_photos()
+        if len(chosen_photos_raw) > 3:
+            chosen_photos_raw = chosen_photos_raw[-3:]
+
+Настроить разницу в возрасте пользователя и кандидатов
+class_client.py, search_pair()
+        if client_info['sex'] == 1:
+            pair_info['age_from'] = current_year - int(client_info['bdate'])
+            pair_info['age_to'] = current_year - int(client_info['bdate']) + 10
+        elif client_info['sex'] == 2:
+            pair_info['age_from'] = current_year - int(client_info['bdate']) - 10
+            pair_info['age_to'] = current_year - int(client_info['bdate'])
+
+где 1 - женщина, 2 - мужчина
+
+Настроить количество искомых кандидатов
+class_client.py, search_pair()
+        search_id_params = {
+            'count': 10,

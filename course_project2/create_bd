@@ -1,0 +1,16 @@
+create table client(
+	id serial primary key,
+	id_vk_client integer
+);
+create table candidate(
+	id serial primary key,
+	id_vk_candidate integer
+);
+
+create table clientcandidate(
+    client_id integer NOT NULL,
+    candidate_id integer  NOT NULL,
+    PRIMARY KEY (client_id, candidate_id),
+    FOREIGN KEY (client_id) REFERENCES client(id),
+    FOREIGN KEY (candidate_id) REFERENCES candidate(id)
+);
